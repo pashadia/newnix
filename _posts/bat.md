@@ -1,0 +1,66 @@
+### What is it?
+
+`bat` is a replacement for the venerable UNIX command `cat`. It retains all functionality of con`cat`enating all files passed as input into its output, while introducing enhancements like syntax highlighting, line numbering, and automatic paging. 
+
+The project is open-source and actively maintained, with a growing community of contributors and users.
+
+### Installation notes
+
+As it's a tool written in Rust, you can simply install it for the current user with
+```
+$ cargo install bat
+```
+
+### Features
+
+#### Syntax highlighting
+This is probably the most important feature of `bat`. It will, by default, highlight the syntax of several languages, at the time of writing 171 of them.
+![[Pasted image 20230511113823.png]]
+
+The theme of the highlighting can be changed as well, for instance `$ bat --theme TwoDark Cargo.toml` in the `bat` repository produces this:
+![[Pasted image 20230511114448.png]]
+
+You can check out all available themes with `$ bat --list-themes`.
+
+#### Git integration
+`bat` shows the `git diff` status of each line on the sidebar. For example, line 2 in the following file has been changed since the last commit (check the left sidebar):
+```
+❯ bat rust-toolchain.toml
+───────┬────────────────────────────────────────────────────
+       │ File: rust-toolchain.toml
+───────┼────────────────────────────────────────────────────
+   1   │ [toolchain]
+   2 ~ │ channel = "1.71.0"
+   3   │ components = ["rustfmt", "rust-src"]
+───────┴────────────────────────────────────────────────────
+```
+#### Automatic paging
+`bat` detects if the output is larger than the current terminal size, and it if is, it will use the default system pager (most likely, `less`). This makes it easier to use than `cat` for large files.
+
+### Make it default
+`bat` detects whether it's running interactively, and if it isn't (i.e. running from a script), it will default to the standard GNU `cat` behavior. This allows you to simply replace `cat` without fear that it might break some scripts.
+
+The way to do this for the current user is to define an alias in the config file of your shell (`.bashrc` or `.zshrc` or `.fishrc` depending on what you use). Add the following line to the end of the file:
+
+```sh
+alias cat=bat
+
+# You can also specify any other flags you always want to use, like the theme
+# alias cat="bat --theme Dracula"
+```
+
+### Integrations
+
+The repository [`bat-extras`](https://github.com/eth-p/bat-extras) contains some scripts for integration with various standard tools. You can install them by following the instructions in the README file.
+
+Some selections:
+* `batwatch` adds syntax highlighting to `watch`
+* `batdiff` adds syntax highlighting to the `git diff` or `delta` output.
+* `batgrep` improves on `ripgrep` by showing some highlighted context to each matched line.
+
+#### `fzf`
+You can use `bat` to preview the output of the excellent fuzzy finder `fzf`.
+```sh
+fzf --preview "bat --color=always --style=numbers --line-range=:500 {}"
+```
+Don't forget the `{}` at the end, that is how `fzf` knows how to call `bat` for the right file. Note that we need to add `--color=always` to let `bat` know it needs to highlight the syntax, even if it's run non-interactively as it's the case.
