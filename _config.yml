@@ -2,3 +2,11 @@ theme: minima
 
 author: Bogdan Agica
 title: "NewNIX: CLI tools for this century"
+
+defaults:
+  - scope:
+      path: "/newnix/assets/img"
+    values:
+      image: true
+
+baseurl: /newnix
